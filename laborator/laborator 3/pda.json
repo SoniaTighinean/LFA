@@ -1,0 +1,14 @@
+{
+  "states": ["q0", "q1", "q2", "q3"],
+  "sigma": ["0", "1"],
+  "stack_symbols": ["0", "$"],
+  "routes": [
+    { "inc": "q0", "read": "ε", "pop": "ε", "push": "$", "fin": "q1" },
+    { "inc": "q1", "read": "0", "pop": "ε", "push": "0", "fin": "q1" },
+    { "inc": "q1", "read": "1", "pop": "0", "push": "ε", "fin": "q2" },
+    { "inc": "q2", "read": "1", "pop": "0", "push": "ε", "fin": "q2" },
+    { "inc": "q2", "read": "ε", "pop": "$", "push": "ε", "fin": "q3" }
+  ],
+  "start": "q0",
+  "final": ["q3"]
+}

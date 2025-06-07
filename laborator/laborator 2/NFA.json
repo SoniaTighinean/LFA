@@ -1,0 +1,13 @@
+{
+  "states": ["s0", "s1", "s2"],
+  "sigma": ["0", "1", "ε"],
+  "routes": [
+    {"inc": "s0", "state": "1", "fin": ["s1"]},
+    {"inc": "s0", "state": "0", "fin": ["s1", "s0"]},
+    {"inc": "s1", "state": "1", "fin": ["s0"]},
+    {"inc": "s1", "state": "0", "fin": ["s2"]},
+    {"inc": "s1", "state": "ε", "fin": ["s2"]}
+  ],
+  "start": ["s0"],
+  "final": ["s2"]
+}

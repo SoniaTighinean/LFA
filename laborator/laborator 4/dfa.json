@@ -1,0 +1,12 @@
+{
+  "states": ["q0", "q1"],
+  "sigma": ["0", "1"],
+  "routes": [
+    { "inc": "q0", "read": "0", "fin": "q1" },
+    { "inc": "q0", "read": "1", "fin": "q0" },
+    { "inc": "q1", "read": "0", "fin": "q0" },
+    { "inc": "q1", "read": "1", "fin": "q1" }
+  ],
+  "start": "q0",
+  "final": ["q0"]
+}
