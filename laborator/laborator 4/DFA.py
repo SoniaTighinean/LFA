@@ -1,34 +1,32 @@
 import json
-import sys
 
-# Deschidem fișierul dfa.json și încărcăm configurația automatului
-with open('dfa.json', 'r', encoding='utf-8') as fisier:
-    dfa = json.load(fisier)
 
-# Inițializăm starea curentă. Automat acceptă fie "start": "q0", fie "start": ["q0"]
-# Aici verificăm tipul și extragem corect valoarea
-stare = dfa["start"] if isinstance(dfa["start"], str) else dfa["start"][0]
+with open('dfa.json', 'r') as f:
+    dfa = json.load(f)
 
-# Citim șirul de intrare de la utilizator
-sir_intrare = input("Introduceți șirul: ")
+# Starea inițială
+starea_curenta = dfa["start"]
 
-# Parcurgem caracter cu caracter
-for simbol in sir_intrare:
-    gasit = False  # Presupunem că nu există tranziție pentru simbolul curent
-    for tranzitie in dfa["routes"]:
-        # Căutăm o tranziție validă din starea curentă pentru simbolul actual
-        if tranzitie["inc"] == stare and tranzitie["read"] == simbol:
-            # Trecem în starea următoare conform tranziției
-            stare = tranzitie["fin"]
-            gasit = True
+sir = input("Input: ")
+
+# Parcurgem fiecare caracter din șir
+for caracter in sir:
+    # Căutăm tranziția corespunzătoare
+    tranzitie_gasita = False
+    
+    for ruta in dfa["routes"]:
+        if ruta["inc"] == starea_curenta and ruta["read"] == caracter:
+            starea_curenta = ruta["fin"]
+            tranzitie_gasita = True
             break
-    if not gasit:
-        # Dacă nu am găsit nicio tranziție validă, automatul respinge cuvântul
-        print("Respins — simbol necunoscut sau fără tranziție validă.")
-        sys.exit()
+    
+    # Dacă nu găsim tranziția, șirul nu e acceptat
+    if not tranzitie_gasita:
+        print("Respins")
+        exit()
 
-# La final, verificăm dacă starea curentă este o stare finală
-if stare in dfa["final"]:
+# Verificăm dacă starea finală e în lista de stări finale
+if starea_curenta in dfa["final"]:
     print("Acceptat")
 else:
     print("Respins")
