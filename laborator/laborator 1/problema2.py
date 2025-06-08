@@ -5,27 +5,26 @@ with open('stari.json', 'r') as f:
 
 cuvant = input("Input: ")
 
-stare = automat["start"][0]  # presupunem că avem o singură stare de start
+if not automat["start"]:
+    print("Eroare: Nu există stare de start")
+    exit()
+stare = automat["start"][0]
 print("Stare inițială:", stare)
 
 for simbol in cuvant:
-    gasit = False  # presupunem inițial că nu avem nicio tranziție validă
-
+    gasit = False  
     for tranzitie in automat["routes"]:
-        # Căutăm o tranziție valabilă din starea curentă cu simbolul curent
-        if tranzitie["inc"] == stare and tranzitie["read"] == simbol:
-            stare = tranzitie["fin"]  # trecem în starea următoare
+        if tranzitie["inc"] == stare and tranzitie["state"] == simbol:
+            stare = tranzitie["fin"]  
             print(f"Citit '{simbol}' → noua stare: {stare}")
             gasit = True
-            break  # ieșim din bucla de căutare, am găsit tranziția
+            break 
 
     if not gasit:
-        # Dacă nu există nicio tranziție valabilă, automatul nu poate continua
         print(f"Eroare: nu există tranziție din '{stare}' cu simbolul '{simbol}'")
         break
 
-# Verificăm dacă am ajuns într-o stare finală
 if stare in automat["final"]:
-    print("Cuvânt acceptat de automat.")
+    print("Acceptat")
 else:
-    print("Cuvânt respins de automat.")
+    print("Respins")
