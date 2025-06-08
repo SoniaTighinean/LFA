@@ -1,10 +1,9 @@
 import json
 
-# Citim automatul din fișierul JSON
 with open('stari.json', 'r') as f:
     automat = json.load(f)
 
-cuvant = input("Introdu cuvântul de testat (format din 0 și 1): ")
+cuvant = input("Input: ")
 
 stare = automat["start"][0]  # presupunem că avem o singură stare de start
 print("Stare inițială:", stare)
@@ -14,7 +13,7 @@ for simbol in cuvant:
 
     for tranzitie in automat["routes"]:
         # Căutăm o tranziție valabilă din starea curentă cu simbolul curent
-        if tranzitie["inc"] == stare and tranzitie["state"] == simbol:
+        if tranzitie["inc"] == stare and tranzitie["read"] == simbol:
             stare = tranzitie["fin"]  # trecem în starea următoare
             print(f"Citit '{simbol}' → noua stare: {stare}")
             gasit = True
