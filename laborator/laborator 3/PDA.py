@@ -55,9 +55,8 @@ while i < len(cuvant):
 
 # epsilon move final
 tranzitie_epsilon = cauta_tranzitie(automat, stare, "ε")
-if tranzitie_epsilon and len(stiva) > 0:
-    if stiva[-1] == tranzitie_epsilon["pop"]:
-        stiva.pop()
+if tranzitie_epsilon:
+    if aplica_tranzitie(tranzitie_epsilon, stiva):
         stare = tranzitie_epsilon["fin"]
 
 # verific acceptarea
