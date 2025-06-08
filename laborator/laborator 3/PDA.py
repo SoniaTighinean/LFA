@@ -1,73 +1,67 @@
 import json
-import sys
 
-# Funcția care aplică toate tranzițiile ε (epsilon) posibile începând dintr-o stare dată
-# Ne folosim de acest mecanism pentru a simula comportamentul nedeterminist al PDA-ului
-def aplica_tranzitii_epsilon(automat, stare, stiva):
-    while True:
-        gasit = False  # Ne oprim doar când nu mai putem aplica nicio tranziție ε
-        for tranzitie in automat["routes"]:
-            if tranzitie["inc"] == stare and tranzitie["read"] == "ε":
-                # Verificăm dacă trebuie să scoatem ceva din stivă (sau nu)
-                if tranzitie["pop"] == "ε" or (stiva and stiva[-1] == tranzitie["pop"]):
-                    # Scoatem de pe stivă dacă e cazul
-                    if tranzitie["pop"] != "ε":
-                        stiva.pop()
-                    # Punem pe stivă dacă e cazul
-                    if tranzitie["push"] != "ε":
-                        stiva.append(tranzitie["push"])
-                    # Ne mutăm în noua stare
-                    stare = tranzitie["fin"]
-                    gasit = True
-                    break
-        if not gasit:
-            break  # Ne oprim dacă nu mai există tranziții epsilon aplicabile
-    return stare, stiva
+def citeste_automat(nume_fisier):
+    with open(nume_fisier, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
-# Citim configurația automatului PDA din fișierul pda.json
-with open('pda.json', 'r', encoding='utf-8') as fisier:
-    automat = json.load(fisier)
+def cauta_tranzitie(automat, stare, caracter):
+    for t in automat["routes"]:
+        if t["inc"] == stare and t["read"] == caracter:
+            return t
+    return None
 
-# Unele fișiere folosesc "start": "q0", altele "start": ["q0"]
-# Codul de mai jos gestionează ambele variante
-stare = automat["start"] if isinstance(automat["start"], str) else automat["start"][0]
-stiva = []  # Inițial, stiva este goală
+def aplica_tranzitie(tranzitie, stiva):
+    # verific daca pot aplica tranzitia
+    if tranzitie["pop"] == "ε":
+        poate_aplica = True
+    elif len(stiva) > 0 and stiva[-1] == tranzitie["pop"]:
+        poate_aplica = True
+    else:
+        poate_aplica = False
+    
+    if poate_aplica:
+        # scot din stiva
+        if tranzitie["pop"] != "ε":
+            stiva.pop()
+        # adaug in stiva
+        if tranzitie["push"] != "ε":
+            stiva.append(tranzitie["push"])
+        return True
+    return False
 
-# Aplicăm toate tranzițiile ε posibile din starea inițială (ex: punem simbolul $ pe stivă)
-stare, stiva = aplica_tranzitii_epsilon(automat, stare, stiva)
+# main
+automat = citeste_automat('pda.json')
+stare = automat["start"]
+stiva = []
 
-# Citim șirul de intrare de la utilizator
-sir_intrare = input("Introduceți șirul: ")
+# epsilon move initial
+tranzitie_epsilon = cauta_tranzitie(automat, stare, "ε")
+if tranzitie_epsilon:
+    if aplica_tranzitie(tranzitie_epsilon, stiva):
+        stare = tranzitie_epsilon["fin"]
 
-# Parcurgem fiecare simbol din șirul de intrare
-for simbol in sir_intrare:
-    potrivit = False  # Ne ajută să știm dacă am găsit o tranziție validă
-    for tranzitie in automat["routes"]:
-        # Găsim o tranziție care se potrivește cu simbolul curent și stiva
-        if tranzitie["inc"] == stare and tranzitie["read"] == simbol:
-            if tranzitie["pop"] == "ε" or (stiva and stiva[-1] == tranzitie["pop"]):
-                # Gestionăm scoaterea din stivă (dacă e cazul)
-                if tranzitie["pop"] != "ε":
-                    stiva.pop()
-                # Gestionăm adăugarea pe stivă (dacă e cazul)
-                if tranzitie["push"] != "ε":
-                    stiva.append(tranzitie["push"])
-                # Ne mutăm în noua stare
-                stare = tranzitie["fin"]
-                # Aplicăm și eventualele tranziții epsilon care decurg din asta
-                stare, stiva = aplica_tranzitii_epsilon(automat, stare, stiva)
-                potrivit = True
-                break  # Nu mai căutăm altă tranziție pentru acest simbol
-    if not potrivit:
-        # Dacă niciuna dintre tranziții nu s-a putut aplica, automatul respinge cuvântul
+cuvant = input("Introduceti sirul: ")
+
+# procesez cuvantul
+i = 0
+while i < len(cuvant):
+    caracter = cuvant[i]
+    tranzitie = cauta_tranzitie(automat, stare, caracter)
+    
+    if tranzitie and aplica_tranzitie(tranzitie, stiva):
+        stare = tranzitie["fin"]
+        i += 1
+    else:
         print("Respins")
-        sys.exit()
+        exit()
 
-# După ce am parcurs tot șirul, mai verificăm o dată dacă putem aplica tranziții ε
-stare, stiva = aplica_tranzitii_epsilon(automat, stare, stiva)
+# epsilon move final
+tranzitie_epsilon = cauta_tranzitie(automat, stare, "ε")
+if tranzitie_epsilon and len(stiva) > 0:
+    if stiva[-1] == tranzitie_epsilon["pop"]:
+        stiva.pop()
+        stare = tranzitie_epsilon["fin"]
 
-# Automat acceptă dacă ajunge într-o stare finală și stiva este complet goală
-if stare in automat["final"] and not stiva:
-    print("Acceptat")
-else:
-    print("Respins")
+# verific acceptarea
+acceptat = stare in automat["final"] and len(stiva) == 0
+print("Acceptat" if acceptat else "Respins")
