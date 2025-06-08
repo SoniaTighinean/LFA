@@ -1,79 +1,51 @@
-import json  # pentru a încărca fișierul NFA.json
+import json
 
-# Funcție care calculează închiderea epsilon pentru un set de stări
 def inchidere_epsilon(nfa, stari):
-    rezultat = set(stari)  # inițial, închidem doar stările primite
+    rezultat = set(stari)
     schimbat = True
 
-    # Repetăm cât timp mai adăugăm stări noi în închidere
     while schimbat:
         schimbat = False
+        # Iterează peste o copie a setului pentru a permite modificarea lui în timpul iterației
         for stare in list(rezultat):
             for tranzitie in nfa["routes"]:
-                # Dacă există o tranziție ε din starea curentă
+                # Verifică dacă tranziția este o tranziție epsilon dintr-o stare activă
                 if tranzitie["inc"] == stare and tranzitie["state"] == "ε":
-                    # CORECTARE: Gestionăm corect array-ul din "fin"
                     for destinatie in tranzitie["fin"]:
                         if destinatie not in rezultat:
                             rezultat.add(destinatie)
-                            schimbat = True  # reluăm ciclul cu noile stări
-
+                            schimbat = True # Setează la True dacă s-au adăugat stări noi, pentru a continua bucla
     return rezultat
 
-# Simulează rularea unui cuvânt pe automatul nedeterminist cu epsilon
 def simuleaza_nfa(nfa, cuvant):
-    # Începem cu închiderea epsilon a stărilor de start
-    stari = inchidere_epsilon(nfa, set(nfa["start"]))
-    print("Stări inițiale cu închidere ε:", stari)
+    # Inițializează setul de stări active cu închiderea epsilon a stărilor de start
+    stari_active = inchidere_epsilon(nfa, set(nfa["start"]))
 
-    # Parcurgem fiecare simbol din cuvânt
-    for simbol in cuvant:
-        urmatoare = set()
-        print(f"Simbol citit: '{simbol}'")
+    # Procesează fiecare simbol din cuvântul de intrare
+    for simbol_curent in cuvant:
+        stari_urmatoare = set()
+        for stare_din_set in stari_active:
+            for regula_tranzitie in nfa["routes"]:
+                # Caută toate tranzițiile posibile din stările active pentru simbolul curent
+                if regula_tranzitie["inc"] == stare_din_set and regula_tranzitie["state"] == simbol_curent:
+                    stari_urmatoare.update(regula_tranzitie["fin"])
+        
+        # Aplică închiderea epsilon pe noile stări obținute, pentru a include și tranzițiile spontane
+        stari_active = inchidere_epsilon(nfa, stari_urmatoare)
+    
+    # Cuvântul este acceptat dacă cel puțin o stare finală este atinsă după procesarea întregului cuvânt
+    return any(stare_finala in nfa["final"] for stare_finala in stari_active)
 
-        for stare in stari:
-            for tranzitie in nfa["routes"]:
-                # Dacă există o tranziție validă cu simbolul curent
-                if tranzitie["inc"] == stare and tranzitie["state"] == simbol:
-                    print(f"  Din {stare} cu '{simbol}' → {tranzitie['fin']}")
-                    # CORECTARE: Gestionăm corect array-ul din "fin"
-                    urmatoare.update(tranzitie["fin"])  # adăugăm toate destinațiile
 
-        # Aplicăm închiderea epsilon din nou pe stările obținute
-        stari = inchidere_epsilon(nfa, urmatoare)
-        print("Stări active după închidere ε:", stari)
-
-    # Verificăm dacă am ajuns într-o stare finală
-    return any(stare in nfa["final"] for stare in stari)
-
-# Funcție auxiliară pentru debugging - afișează structura automatului
-def afiseaza_automat(nfa):
-    print("=== Structura automatului ===")
-    print(f"Stări: {nfa['states']}")
-    print(f"Alfabet: {nfa['sigma']}")
-    print(f"Stări de start: {nfa['start']}")
-    print(f"Stări finale: {nfa['final']}")
-    print("Tranziții:")
-    for tranzitie in nfa["routes"]:
-        print(f"  {tranzitie['inc']} --{tranzitie['state']}--> {tranzitie['fin']}")
-    print("=" * 30)
-
-# Citim automatul din fișierul JSON
 try:
-    with open("nfa.json", "r", encoding='utf-8') as f:
-        nfa = json.load(f)
+    with open("NFA.json", "r", encoding='utf-8') as f:
+        automat_nfa = json.load(f)
     
-    # Afișăm structura pentru debugging
-    afiseaza_automat(nfa)
+    cuvant_intrare = input("Input: ")
     
-    # Cerem utilizatorului să introducă un cuvânt
-    cuvant = input("Introdu cuvântul: ")
+    rezultat_simulare = simuleaza_nfa(automat_nfa, cuvant_intrare)
     
-    # Apelăm funcția de simulare și afișăm rezultatul
-    rezultat = simuleaza_nfa(nfa, cuvant)
-    print("\n" + "="*20)
-    print("ACCEPTAT" if rezultat else "RESPINS")
-    print("="*20)
+    print("ACCEPTAT" if rezultat_simulare else "RESPINS")
 
 except FileNotFoundError:
     print("Eroare: Fișierul 'NFA.json' nu a fost găsit!")
