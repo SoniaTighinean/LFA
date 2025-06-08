@@ -1,9 +1,6 @@
 import json
 
 def calculeaza_tranzitii_epsilon(automat, starile_curente):
-    """
-    Calculează închiderea epsilon pentru un set de stări
-    """
     configuratie_noua = set(starile_curente)
     gasit_modificare = True
     
@@ -61,7 +58,7 @@ def main():
 
     try:
         # Încărcăm definirea automatului din fișier
-        with open("NFA.json", "r", encoding='utf-8') as fisier:
+        with open("NFA.json", "r") as fisier:
             definitie_automat = json.load(fisier)
         
         # Citim secvența de test de la utilizator
@@ -72,9 +69,9 @@ def main():
         
         # Afișăm rezultatul
         if este_acceptata:
-            print("ACCEPTATĂ")
+            print("Acceptat")
         else:
-            print("RESPINSĂ")
+            print("Respins")
             
     except FileNotFoundError:
         print("EROARE: Nu s-a găsit fișierul 'NFA.json'")
