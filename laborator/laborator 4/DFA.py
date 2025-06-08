@@ -23,7 +23,7 @@ for caracter in sir:
     # Dacă nu găsim tranziția, șirul nu e acceptat
     if not tranzitie_gasita:
         print("Respins")
-        return
+        exit()
 
 # Verificăm dacă starea finală e în lista de stări finale
 if starea_curenta in dfa["final"]:
