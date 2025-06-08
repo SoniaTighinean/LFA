@@ -1,7 +1,7 @@
 import json
 
 def citeste_automat(nume_fisier):
-    with open(nume_fisier, 'r', encoding='utf-8') as f:
+    with open(nume_fisier, 'r') as f:
         return json.load(f)
 
 def cauta_tranzitie(automat, stare, caracter):
@@ -20,16 +20,14 @@ def aplica_tranzitie(tranzitie, stiva):
         poate_aplica = False
     
     if poate_aplica:
-        # scot din stiva
         if tranzitie["pop"] != "ε":
             stiva.pop()
-        # adaug in stiva
         if tranzitie["push"] != "ε":
             stiva.append(tranzitie["push"])
         return True
     return False
 
-# main
+
 automat = citeste_automat('pda.json')
 stare = automat["start"]
 stiva = []
@@ -40,7 +38,7 @@ if tranzitie_epsilon:
     if aplica_tranzitie(tranzitie_epsilon, stiva):
         stare = tranzitie_epsilon["fin"]
 
-cuvant = input("Introduceti sirul: ")
+cuvant = input("Input: ")
 
 # procesez cuvantul
 i = 0
