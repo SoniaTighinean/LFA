@@ -24,9 +24,6 @@ def calculeaza_tranzitii_epsilon(automat, starile_curente):
     return configuratie_noua
 
 def proceseaza_automat(automat, secventa_intrare):
-    """
-    Simulează execuția automatului pe secvența de intrare
-    """
     # Pornim cu stările inițiale și aplicăm închiderea epsilon
     configuratie_actuala = calculeaza_tranzitii_epsilon(automat, set(automat["start"]))
     
@@ -60,9 +57,8 @@ def main():
         # Încărcăm definirea automatului din fișier
         with open("NFA.json", "r") as fisier:
             definitie_automat = json.load(fisier)
-        
-        # Citim secvența de test de la utilizator
-        secventa_test = input("Introduceți secvența: ")
+            
+        secventa_test = input("Input: ")
         
         # Executăm simularea
         este_acceptata = proceseaza_automat(definitie_automat, secventa_test)
