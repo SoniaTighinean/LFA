@@ -1,77 +1,77 @@
 
-## Laborator 1 - Introducere si DFA de baza
-### Problema 1 - Lucru cu matrici
-- **problema1.py** - Program care citeste o matrice dintr-un fisier text, o valideaza (verifica daca toate liniile au aceeasi lungime) si o scrie in alt fisier
-- **matrice.txt** - fisierul de input cu matricea 3x3
-- **iesire.txt** - fisierul de output
-- Programul are error handling pentru fisiere inexistente si matrici invalide
 
-### Problema 2 - DFA simplu  
-- **problema2.py** - Primul meu automat finit determinist care accepta cuvinte
-- **stari.json** - JSON cu definitia automatului (2 stari: q0, q1)
-- Automatul accepta cuvinte care au un numar impar de simboluri (0 sau 1)
-- Citeste caracter cu caracter si schimba starea, la final verifica daca e in stare finala
+### DFA (Deterministic Finite Automaton)
+- `laborator/dfa/DFA.py` - implementarea principală
+- `laborator/dfa/dfa.json` - definirea automatului
 
-## Laborator 2 - NFA (Automate Nedeterministe)
-- **NFA.py** - Implementare completa pentru automate nedeterministe cu tranzitii epsilon
-- **NFA.json** - Definitia automatului cu 3 stari (q0, q1, q2)
-- Am implementat functia pentru epsilon-closure care calculeaza toate starile accesibile prin tranzitii epsilon
-- Algoritmul parcurge toate starile posibile in paralel si verifica la final daca macar una e finala
+**Ce face:** Simulează un automat finit determinist care acceptă stringuri binare cu un număr par de zerouri.
 
-## Laborator 3 - PDA (Automate cu Stiva)
-- **PDA.py** - Automat pushdown care recunoaste limbajul 0^n1^n (acelasi numar de 0-uri si 1-uri)
-- **pda.json** - Definitia cu 4 stari si operatii pe stiva (push/pop)
-- Algoritmul:
-  1. Pune $ pe stiva la inceput (epsilon move)
-  2. Pentru fiecare 0 citit, pune un 0 pe stiva  
-  3. Pentru fiecare 1 citit, scoate un 0 de pe stiva
-  4. La final scoate $ si ajunge in starea finala
+**Cum funcționează:**
+- Citește definirea automatului din JSON
+- Parcurge caracterele din string
+- Verifică tranzițiile și acceptă/respinge stringul
 
-## Laborator 4 - DFA (Automat Finit Determinist)
-- **DFA.py** - Implementare clasica de DFA, mai simpla decat NFA
-- **dfa.json** - Automat cu 2 stari care accepta cuvinte cu numar par de 0-uri
-- Algoritmul e direct: citeste caracter, gaseste tranzitia corespunzatoare, schimba starea
+### NFA (Nondeterministic Finite Automaton)  
+- `laborator/nfa/NFA.py` - implementarea principală
+- `laborator/nfa/NFA.json` - definirea automatului
 
-## Cum rulez programele:
+**Ce face:** Simulează un automat finit nedeterminist cu tranzițiile epsilon.
 
-### Pentru matrici (Lab 1):
+**Funcționalități:**
+- Calculează închiderea epsilon pentru stări
+- Gestionează configurații multiple de stări
+- Acceptă un string dacă există cel puțin un drum de acceptare
+
+### PDA (Pushdown Automaton)
+- `laborator/pda/PDA.py` - implementarea principală  
+- `laborator/pda/pda.json` - definirea automatului
+
+**Ce face:** Simulează un automat cu stivă care recunoaște limbajul {0^n 1^n | n ≥ 1}.
+
+**Componente:**
+- Stivă pentru memorarea simbolurilor
+- Tranzițiile epsilon pentru inițializare și finalizare
+- Verificare că stiva este goală la sfârșitul procesării
+
+## Cum să rulezi
+
+Pentru fiecare tip de automat:
+
 ```bash
-python problema1.py
-# Citeste din matrice.txt si scrie in iesire.txt
-```
-
-### Pentru automate (Lab 1, 2, 3, 4):
-```bash
-python problema2.py
-# Input: 101 (exemplu)
-# Output: Acceptat/Respins
-
-python NFA.py  
-# Input: 01 (exemplu)
-# Output: Acceptat/Respins
-
-python PDA.py
-# Input: 0011 (exemplu pentru 0^n1^n)
-# Output: Acceptat/Respins
-
+cd laborator/dfa
 python DFA.py
-# Input: 00 (exemplu pentru numar par de 0-uri)
-# Output: Acceptat/Respins
+
+cd laborator/nfa  
+python NFA.py
+
+cd laborator/pda
+python PDA.py
 ```
 
-## Structura fisierelor JSON:
-Toate automatele sunt definite in JSON cu urmatoarele campuri:
-- `states` - lista cu toate starile
-- `sigma` - alfabetul (simbolurile acceptate)  
-- `routes` - tranzitiile (inc=stare_initiala, fin=stare_finala)
-- `start` - starea initiala
-- `final` - lista cu starile finale
+Introduci stringul de test când ești întrebat.
 
-Pentru PDA mai am si:
-- `stack_symbols` - simbolurile care pot fi pe stiva
-- `read`, `pop`, `push` - operatii pentru fiecare tranzitie
+## Exemple de teste
 
-## Note:
-- Toate programele citesc input de la tastatura
-- Fisierele JSON contin definitiile automatelor  
-- Pentru PDA trebuie sa ai grija ca stiva sa fie goala la final
+**DFA:** 
+- `1010` → Acceptat (2 zerouri - par)
+- `101` → Respins (1 zero - impar)
+
+**NFA:**
+- `10` → Acceptat  
+- `01` → Respins
+
+**PDA:**
+- `0011` → Acceptat (2 zerouri urmate de 2 unuri)
+- `001` → Respins (numărul de zerouri ≠ numărul de unuri)
+
+## Format JSON
+
+Fiecare automat folosește o structură JSON standardizată cu:
+- `states` - lista stărilor
+- `sigma` - alfabetul de intrare  
+- `routes` - tranzițiile
+- `start` - starea inițială
+- `final` - stările finale
+
+Pentru PDA se adaugă și `stack_symbols` pentru simbolurile stivei.
+
